@@ -5,8 +5,7 @@ from django.http import JsonResponse
 
 from django.http import JsonResponse
 
-def posts_list(request):
-    data = [
+POSTS_DATA = [
         {
     "userId": 1,
     "id": 1,
@@ -20,7 +19,9 @@ def posts_list(request):
     "body": "est rerum tempore vitae\nsequi sint nihil reprehenderit dolor beatae ea dolores neque\nfugiat blanditiis voluptate porro vel nihil molestiae ut reiciendis\nqui aperiam non debitis possimus qui neque nisi nulla"
     }
     ]
-    return JsonResponse(data, safe=False)
+
+def posts_list(request):
+    return JsonResponse(POSTS_DATA, safe=False)
 
 def comments_list(request):
     data = [
@@ -142,3 +143,26 @@ def users_list(request):
     },
     ]
     return JsonResponse(data, safe=False)
+
+def saluta_nome(request, name):
+    messaggio = f"Ciao {name}, benvenuto/a nella tua rotta dinamica"
+    return JsonResponse({'messaggio': messaggio}) 
+
+def post_details(request, post_id):
+    post_trovato = None
+    for p in POSTS_DATA:
+        if str(p['id']) == str(post_id):
+            post_trovato = p
+            break
+    
+    if post_trovato:
+        return JsonResponse(post_trovato)
+    return JsonResponse({"errore": "Post non trovato"}, status=404)
+    '''
+    messaggio = f"Stai visualizzando i dettagli del post numero {post_id}"
+    return JsonResponse({
+        'id_ricevuto': post_id,
+        'messaggio': messaggio,
+        'status': 'successo'
+        })
+    '''

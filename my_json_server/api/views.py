@@ -5,6 +5,21 @@ from django.http import JsonResponse
 
 from django.http import JsonResponse
 
+def api_index(request):
+    return JsonResponse({
+        "project": "JSONPlaceholder Clone API",
+        "version": "1.0.0",
+        "author": "Elisabetta Fino",
+        "endpoint_disponibili": {
+            "posts": "api/posts/",
+            "comments": "api/comments/",
+            "albums": "api/albums/",
+            "photos": "api/photos/",
+            "todos": "api/todos/",
+            "users": "api/users/"
+        },
+        })
+
 POSTS_DATA = [
         {
     "userId": 1,
@@ -22,6 +37,17 @@ POSTS_DATA = [
 
 def posts_list(request):
     return JsonResponse(POSTS_DATA, safe=False)
+
+def post_details(request, post_id):
+    post_trovato = None
+    for p in POSTS_DATA:
+        if str(p['id']) == str(post_id):
+            post_trovato = p
+            break
+    
+    if post_trovato:
+        return JsonResponse(post_trovato)
+    return JsonResponse({"errore": "Post non trovato"}, status=404)
 
 def comments_list(request):
     data = [
@@ -144,25 +170,13 @@ def users_list(request):
     ]
     return JsonResponse(data, safe=False)
 
+# Questa funzione serve per la rotta saluta/<str:name>/
 def saluta_nome(request, name):
     messaggio = f"Ciao {name}, benvenuto/a nella tua rotta dinamica"
-    return JsonResponse({'messaggio': messaggio}) 
+    return JsonResponse({'messaggio': messaggio})
 
-def post_details(request, post_id):
-    post_trovato = None
-    for p in POSTS_DATA:
-        if str(p['id']) == str(post_id):
-            post_trovato = p
-            break
-    
-    if post_trovato:
-        return JsonResponse(post_trovato)
-    return JsonResponse({"errore": "Post non trovato"}, status=404)
-    '''
-    messaggio = f"Stai visualizzando i dettagli del post numero {post_id}"
-    return JsonResponse({
-        'id_ricevuto': post_id,
-        'messaggio': messaggio,
-        'status': 'successo'
-        })
-    '''
+# Questa funzione serve per la rotta posts/user/<int:user_id>/
+def user_posts(request, user_id):
+    # Filtriamo i post della lista globale POSTS_DATA
+    filtrati = [p for p in POSTS_DATA if p['userId'] == user_id]
+    return JsonResponse(filtrati, safe=False)
